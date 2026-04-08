@@ -78,17 +78,50 @@ body {
   z-index: -1;
 }
 
-/* Modern Glassmorphism */
+/* Modern Glassmorphism Utilities */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid var(--glass-border);
+}
+
+.glass-capsule {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  box-shadow: 0 8px 32px -4px rgba(0, 51, 102, 0.1);
+}
+
+/* Glowing Effects */
+.assistant-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+[data-theme='dark'] .assistant-glow {
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.15), inset 0 0 10px rgba(255, 215, 0, 0.05);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+[data-theme='dark'] .bubble-oval {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Floating Action Button */
+.fab-shadow {
+  box-shadow: 0 10px 25px -5px rgba(0, 51, 102, 0.2), 0 8px 10px -6px rgba(0, 51, 102, 0.2);
+}
+
+/* Premium Typography Refinement */
+.text-balance {
+  text-wrap: balance;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -96,31 +129,17 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 51, 102, 0.2);
+  background: rgba(0, 51, 102, 0.15);
   border-radius: 10px;
 }
 
-/* Markdown Styling */
-.markdown-body ul {
-  list-style-type: disc;
-  margin-left: 1.25rem;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 51, 102, 0.3);
 }
 
-.markdown-body ol {
-  list-style-type: decimal;
-  margin-left: 1.25rem;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.markdown-body p {
-  margin-bottom: 0.5rem;
-}
-
-.markdown-body p:last-child {
-  margin-bottom: 0;
+/* Markdown Styling Refined */
+.markdown-body {
+  line-height: 1.6;
 }
 
 .markdown-body strong {
@@ -171,17 +190,15 @@ body {
 
 /* Chat Bubble Shapes */
 .bubble-cloud {
-  border-radius: 30px 30px 30px 5px !important;
-  border-bottom-left-radius: 5px !important;
+  border-radius: 24px 24px 4px 24px !important;
   box-shadow: 
-    0 10px 15px -3px rgba(0, 51, 102, 0.1),
-    inset 0 2px 4px rgba(255, 255, 255, 0.5);
+    0 4px 15px rgba(0, 210, 255, 0.1),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
 .bubble-oval {
-  border-radius: 40px !important;
-  border-top-left-radius: 5px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 20px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* Custom Fonts */
@@ -189,7 +206,6 @@ body {
 
 .font-user {
   font-family: 'Quicksand', sans-serif;
-  color: #ffffff;
 }
 
 .font-assistant {

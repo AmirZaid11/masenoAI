@@ -33,16 +33,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
   }, [text]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent z-50">
-      <div className="max-w-3xl mx-auto flex items-end gap-3">
-        <div className="flex-1 glass-panel rounded-2xl shadow-xl border border-white/40 overflow-hidden flex items-end p-3 min-h-[56px] transition-all focus-within:ring-2 focus-within:ring-[#003366]/20 focus-within:border-[#003366]/30">
+    <div className="fixed bottom-8 left-0 right-0 px-4 sm:px-6 z-50 pointer-events-none">
+      <div className="max-w-3xl mx-auto flex items-end gap-3 pointer-events-auto">
+        <div className="flex-1 glass-capsule shadow-2xl border border-white/20 overflow-hidden flex items-end p-2 min-h-[56px] transition-all focus-within:ring-4 focus-within:ring-[#00d2ff]/10 focus-within:border-[#00d2ff]/30">
           <textarea
             ref={inputRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask MSU AI anything..."
-            className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-1.5 px-3 text-[15px] max-h-[120px] outline-none text-slate-700 placeholder:text-slate-400"
+            className="flex-1 bg-transparent border-none focus:ring-0 resize-none py-2.5 px-4 text-[15px] max-h-[120px] outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
             rows={1}
           />
         </div>
@@ -51,10 +51,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
           onClick={handleSubmit}
           disabled={!text.trim() || isLoading}
           className={`
-            w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-300
+            w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 shrink-0
             ${text.trim() 
-              ? 'bg-[#003366] hover:bg-[#004488] active:scale-90 text-[#FFD700]' 
-              : 'bg-white text-slate-300 cursor-not-allowed border border-slate-100'
+              ? 'bg-linear-to-br from-[#00d2ff] to-[#9d50bb] hover:scale-105 active:scale-90 text-white shadow-[#00d2ff]/20' 
+              : 'bg-white/40 dark:bg-slate-800/40 text-slate-300 cursor-not-allowed border border-white/10'
             }
           `}
         >
@@ -64,17 +64,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
             <Send size={22} className={text.trim() ? 'animate-in fade-in zoom-in duration-300' : ''} />
           )}
         </button>
-      </div>
-      <div className="flex flex-col items-center mt-4 gap-1">
-        <div className="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
-          <Sparkles size={10} className="text-[#003366]" />
-          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#003366]">
-            Verified by <a href="https://www.maseno.ac.ke/" target="_blank" rel="noopener noreferrer" className="underline decoration-[#003366]/30 hover:decoration-[#003366]">maseno.ac.ke</a>
-          </span>
-        </div>
-        <div className="text-[9px] font-extrabold text-slate-500/60 uppercase tracking-[0.3em] mt-1">
-          Developed by Ernest | Amina | Amina
-        </div>
       </div>
     </div>
   );

@@ -34,35 +34,44 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message, backgroundType 
           ? 'bubble-cloud font-user bg-[#003366] text-white' 
           : `bubble-oval font-assistant ${isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-800'} shadow-sm border border-black/5`
         }
-      `}>
-        <div className="flex flex-col">
-          <div className={`markdown-body text-[15px] leading-relaxed ${isUser ? 'text-white/95' : isDark ? 'text-slate-100' : 'text-slate-700'}`}>
-            <ReactMarkdown
-              components={{
-                a: ({ node, ...props }) => (
-                  <a 
-                    {...props} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className={`${isUser ? 'text-amber-300 underline' : 'text-blue-500'} hover:opacity-80 font-bold`}
-                  />
-                )
-              }}
-            >
-              {message.text}
-            </ReactMarkdown>
+      {!isUser && (
+        <div className="flex items-center gap-2 mb-1.5 ml-2">
+          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Assistant</span>
+          {message.engine === 'ai' && (
+            <span className="px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-600 text-[8px] font-bold uppercase tracking-tighter">AI Powered</span>
+          )}
+        </div>
+      )}
+
+      <div className="flex gap-3 items-end group">
+        {!isUser && (
+          <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 mb-1 shadow-sm">
+            <Bot size={18} className="text-[#003366]" />
           </div>
-          <div className={`flex items-center gap-2 mt-2 pt-2 border-t ${isUser ? 'border-white/10' : 'border-slate-100/10'}`}>
-            <span className={`text-[10px] font-medium ${isUser ? 'text-white/40' : 'text-slate-400'}`}>
-              {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
-            {!isUser && message.engine && (
-              <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-500'}`}>
-                {message.engine}
-              </span>
-            )}
+        )}
+
+        <div className={`
+          relative px-5 py-3.5
+          ${isUser 
+            ? 'bubble-cloud bg-linear-to-br from-[#00d2ff] to-[#9d50bb] font-user text-white' 
+            : `bubble-oval ${backgroundType === 'white' ? 'bg-[#f8fafc]' : 'bg-slate-800'} font-assistant assistant-glow`
+          }
+        `}>
+          <div className="markdown-body text-sm sm:text-base">
+            <ReactMarkdown>{message.text}</ReactMarkdown>
+          </div>
+          
+          <div className={`mt-2 text-[9px] ${isUser ? 'text-white/60' : 'text-slate-400'} flex items-center gap-1.5`}>
+            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {isUser && <CheckCheck size={12} className="text-white/80" />}
           </div>
         </div>
+
+        {isUser && (
+          <div className="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center shrink-0 mb-1 shadow-sm group-hover:scale-110 transition-transform">
+            <span className="text-lg">😊</span>
+          </div>
+        )}
       </div>
     </motion.div>
   );

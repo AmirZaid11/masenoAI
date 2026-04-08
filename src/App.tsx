@@ -5,9 +5,12 @@ import { ChatInput } from './components/ChatInput';
 import { Message, getGrokResponse } from './lib/grok';
 import { motion, AnimatePresence } from 'motion/react';
 import { BackgroundType } from './components/ThemeToggle';
+import { ArrowDown, Info, X } from 'lucide-react';
 
 export default function App() {
   const [theme, setTheme] = useState<BackgroundType>('white');
+  const [showScrollFAB, setShowScrollFAB] = useState(false);
+  const [showToast, setShowToast] = useState(true);
   
   const welcomeMessage: Message = {
     id: 'welcome',
@@ -19,6 +22,7 @@ export default function App() {
   const [messages, setMessages] = useState<Message[]>([welcomeMessage]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Generate galaxy stars
   const stars = useMemo(() => {
@@ -34,6 +38,13 @@ export default function App() {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+    setShowScrollFAB(!isAtBottom);
   };
 
   useEffect(() => {
@@ -83,7 +94,7 @@ export default function App() {
   return (
     <div 
       data-theme={theme === 'white' ? 'light' : 'dark'}
-      className={`min-h-screen flex flex-col transition-colors duration-500 ${theme === 'black' ? 'bg-black-plain text-white' : theme === 'white' ? 'bg-white-plain text-slate-800' : ''}`}
+      className={`min-h-screen flex flex-col transition-colors duration-500 overflow-hidden ${theme === 'black' ? 'bg-black-plain text-white' : theme === 'white' ? 'bg-white-plain text-slate-800' : ''}`}
     >
       {theme === 'galaxy' && (
         <div className="bg-galaxy">
@@ -108,33 +119,72 @@ export default function App() {
       
       <Header theme={theme} onThemeChange={setTheme} onClearChat={handleClearChat} />
       
-      <main className="flex-1 pt-24 pb-24 px-4 overflow-y-auto max-w-4xl mx-auto w-full relative z-10">
-        <AnimatePresence initial={false}>
-          {messages.map((msg) => (
-            <ChatBubble key={msg.id} message={msg} backgroundType={theme} />
-          ))}
-        </AnimatePresence>
-        
-        {isLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex justify-start mb-4"
+      <main 
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 pt-24 pb-32 px-4 overflow-y-auto w-full relative z-10 scroll-smooth"
+      >
+        <div className="max-w-4xl mx-auto w-full">
+          <AnimatePresence mode="popLayout">
+            {messages.map((msg) => (
+              <ChatBubble key={msg.id} message={msg} backgroundType={theme} />
+            ))}
+          </AnimatePresence>
+          
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-start mb-4"
+            >
+              <div className={`px-4 py-2 rounded-2xl rounded-tl-none bubble-border shadow-sm flex items-center gap-1 ${theme === 'black' || theme === 'galaxy' ? 'bg-slate-800' : 'bg-[#9A97C2]'}`}>
+                <span className="w-1.5 h-1.5 bg-black/40 rounded-full animate-bounce"></span>
+                <span className="w-1.5 h-1.5 bg-black/40 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                <span className="w-1.5 h-1.5 bg-black/40 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+              </div>
+            </motion.div>
+          )}
+          
+          <div ref={messagesEndRef} />
+        </div>
+      </main>
+
+      {/* Floating Action Elements */}
+      <AnimatePresence>
+        {showScrollFAB && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+            onClick={scrollToBottom}
+            className={`fixed bottom-28 right-8 z-50 w-12 h-12 rounded-full flex items-center justify-center fab-shadow transition-colors ${theme === 'white' ? 'bg-white text-[#003366]' : 'bg-slate-800 text-white border border-white/10'}`}
           >
-            <div className={`px-4 py-2 rounded-2xl rounded-tl-none bubble-border shadow-sm flex items-center gap-1 ${theme === 'black' ? 'bg-slate-800' : (theme === 'galaxy' ? 'bg-slate-800' : 'bg-[#9A97C2]')}`}>
-              <span className="w-1.5 h-1.5 bg-black/40 rounded-full animate-bounce"></span>
-              <span className="w-1.5 h-1.5 bg-black/40 rounded-full animate-bounce [animation-delay:0.2s]"></span>
-              <span className="w-1.5 h-1.5 bg-black/40 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+            <ArrowDown size={24} />
+          </motion.button>
+        )}
+
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: -20, x: '-50%' }}
+            className="fixed top-24 left-1/2 z-50 w-[90%] max-w-md"
+          >
+            <div className={`glass-panel p-4 rounded-2xl shadow-2xl border border-white/20 flex items-start gap-4 ${theme === 'white' ? 'bg-white/90' : 'bg-slate-900/90 text-white'}`}>
+              <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
+                <Info size={20} className="text-orange-500" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-bold text-sm">Maseno AI Assistant</h4>
+                <p className="text-xs opacity-70 mt-0.5">Under implementation. Verify critical info with official university portals.</p>
+              </div>
+              <button onClick={() => setShowToast(false)} className="p-1 hover:bg-black/5 rounded-lg transition-colors">
+                <X size={16} />
+              </button>
             </div>
           </motion.div>
         )}
-        
-        <div ref={messagesEndRef} />
-        
-        <p className="disclaimer-text mt-8 opacity-50">
-          MSU AI Assistant | Version 1.0 lite | Developed by Comrade Developers
-        </p>
-      </main>
+      </AnimatePresence>
 
       <div className="fixed bottom-0 left-0 right-0 z-50">
         <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
