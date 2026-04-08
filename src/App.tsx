@@ -11,7 +11,7 @@ export default function App() {
   
   const welcomeMessage: Message = {
     id: 'welcome',
-    text: "Welcome to MSU AI 👋\n\nI am your **Official Maseno University Student Assistant**, developed by **Ernest, Amina, and Amina**. I am specifically programmed to help you navigate all Maseno University academic and campus matters with ease.\n\nHow can I assist you today? You can ask me about:\n- 📅 **Exam Timetables** & Download Links\n- 💰 **Fees** & Payment Procedures\n- 🏠 **Hostel** Booking & Registration\n- 📝 **Course Registration** (Units)\n\n⚠️ **Please note**: I am still under development (**Version 1.0 lite**), so I may occasionally make errors. Always cross-check critical information with the official university portals.\n\n**We love you, Comrade!** How can I help you navigate MSU today?",
+    text: "### Welcome to MSU AI (V1.0 Lite) 👋\n\nDeveloped by **Ernest, Amina, and Amina** to help you navigate Maseno with ease. \n\n**Ask me about:**\n📅 Exams | 💰 Fees | 🏠 Hostels | 📝 Units\n\n⚠️ *Under development—verify critical info.*\n\n**We love you, Comrade!** How can I help?",
     sender: 'assistant',
     timestamp: new Date()
   };
