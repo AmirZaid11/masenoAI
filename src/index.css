@@ -14,6 +14,15 @@
   --assistant-gradient: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   --glass-bg: rgba(255, 255, 255, 0.9);
   --glass-border: rgba(255, 255, 255, 0.5);
+  
+  /* Theme-aware variables */
+  --text-assistant: #1e293b;
+  --text-strong: #003366;
+}
+
+[data-theme='dark'] {
+  --text-assistant: #f8fafc;
+  --text-strong: #FFD700; /* MSU Gold for better visibility on dark */
 }
 
 body {
@@ -116,5 +125,84 @@ body {
 
 .markdown-body strong {
   font-weight: 700;
-  color: var(--msu-blue);
+  color: var(--text-strong);
 }
+
+/* Theme Backgrounds */
+.bg-galaxy {
+  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+/* Galaxy Stars Effect */
+.galaxy-stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@keyframes stars-float {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-2000px); }
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: stars-float linear infinite;
+}
+
+.bg-white-plain {
+  background: #ffffff !important;
+}
+
+.bg-black-plain {
+  background: #000000 !important;
+  color: #ffffff;
+}
+
+/* Chat Bubble Shapes */
+.bubble-cloud {
+  border-radius: 30px 30px 30px 5px !important;
+  border-bottom-left-radius: 5px !important;
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 51, 102, 0.1),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.bubble-oval {
+  border-radius: 40px !important;
+  border-top-left-radius: 5px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Custom Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&family=Outfit:wght@400;700&display=swap');
+
+.font-user {
+  font-family: 'Quicksand', sans-serif;
+  color: #ffffff;
+}
+
+.font-assistant {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-assistant);
+}
+
+.disclaimer-text {
+  font-size: 11px;
+  color: rgba(148, 163, 184, 0.6);
+  text-align: center;
+  padding: 1rem;
+  font-style: italic;
+  width: 100%;
+}
+
