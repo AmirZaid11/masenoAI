@@ -2,21 +2,21 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Header } from './components/Header';
 import { ChatBubble } from './components/ChatBubble';
 import { ChatInput } from './components/ChatInput';
-import { Message, localLookup, getGrokResponse } from './lib/grok';
+import { Message, getGrokResponse } from './lib/grok';
 import { motion, AnimatePresence } from 'motion/react';
 import { BackgroundType } from './components/ThemeToggle';
 
 export default function App() {
   const [theme, setTheme] = useState<BackgroundType>('white');
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "### Welcome to MSU AI 👋\n\nI am your **Official Maseno University Student Assistant**. I have real-time access to university announcements, timetables, and academic resources.\n\nHow can I assist you today? You can ask me about:\n- 📅 **Exam Timetables** & Download Links\n- 💰 **Fees** & Payment Procedures\n- 🏠 **Hostel** Booking & Registration\n- 📝 **Course Registration** (Units)\n\n*How can I help you navigate MSU today?*",
-      sender: 'assistant',
-      timestamp: new Date(),
-      engine: 'local'
-    }
-  ]);
+  
+  const welcomeMessage: Message = {
+    id: 'welcome',
+    text: "Welcome to MSU AI 👋\n\nI am your **Official Maseno University Student Assistant**, developed by **Ernest, Amina, and Amina**. I am specifically programmed to help you navigate all Maseno University academic and campus matters with ease.\n\nHow can I assist you today? You can ask me about:\n- 📅 **Exam Timetables** & Download Links\n- 💰 **Fees** & Payment Procedures\n- 🏠 **Hostel** Booking & Registration\n- 📝 **Course Registration** (Units)\n\n⚠️ **Please note**: I am still under development (**Version 1.0 lite**), so I may occasionally make errors. Always cross-check critical information with the official university portals.\n\n**We love you, Comrade!** How can I help you navigate MSU today?",
+    sender: 'assistant',
+    timestamp: new Date()
+  };
+
+  const [messages, setMessages] = useState<Message[]>([welcomeMessage]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -51,25 +51,7 @@ export default function App() {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
 
-    // 1. Local Lookup
-    const localAnswer = localLookup(text);
-    
-    if (localAnswer) {
-      setTimeout(() => {
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: localAnswer,
-          sender: 'assistant',
-          timestamp: new Date(),
-          engine: 'local'
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-        setIsLoading(false);
-      }, 600);
-      return;
-    }
-
-    // 2. AI Response
+    // AI Response (Context/Matching is handled inside getGrokResponse)
     try {
       const chatAnswer = await getGrokResponse(text, messages);
       const assistantMessage: Message = {
@@ -92,6 +74,10 @@ export default function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleClearChat = () => {
+    setMessages([welcomeMessage]);
   };
 
   return (
@@ -120,7 +106,7 @@ export default function App() {
         </div>
       )}
       
-      <Header theme={theme} onThemeChange={setTheme} />
+      <Header theme={theme} onThemeChange={setTheme} onClearChat={handleClearChat} />
       
       <main className="flex-1 pt-24 pb-24 px-4 overflow-y-auto max-w-4xl mx-auto w-full relative z-10">
         <AnimatePresence initial={false}>
@@ -135,7 +121,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             className="flex justify-start mb-4"
           >
-            <div className={`px-4 py-2 rounded-2xl rounded-tl-none bubble-border shadow-sm flex items-center gap-1 ${theme === 'black' ? 'bg-slate-800' : 'bg-[#9A97C2]'}`}>
+            <div className={`px-4 py-2 rounded-2xl rounded-tl-none bubble-border shadow-sm flex items-center gap-1 ${theme === 'black' ? 'bg-slate-800' : (theme === 'galaxy' ? 'bg-slate-800' : 'bg-[#9A97C2]')}`}>
               <span className="w-1.5 h-1.5 bg-black/40 rounded-full animate-bounce"></span>
               <span className="w-1.5 h-1.5 bg-black/40 rounded-full animate-bounce [animation-delay:0.2s]"></span>
               <span className="w-1.5 h-1.5 bg-black/40 rounded-full animate-bounce [animation-delay:0.4s]"></span>
@@ -146,7 +132,7 @@ export default function App() {
         <div ref={messagesEndRef} />
         
         <p className="disclaimer-text mt-8 opacity-50">
-          Developer Notice: This AI is still under implementation. Some responses may not be 100% accurate.
+          MSU AI Assistant | Version 1.0 lite | Developed by Comrade Developers
         </p>
       </main>
 
@@ -156,4 +142,3 @@ export default function App() {
     </div>
   );
 }
-
