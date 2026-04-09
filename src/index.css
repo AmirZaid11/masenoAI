@@ -179,6 +179,35 @@ body {
   animation: stars-float linear infinite;
 }
 
+/* Voice & Mic Animations */
+@keyframes mic-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.mic-active {
+  animation: mic-pulse 1.5s infinite;
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+@keyframes voice-wave {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+.wave-bar {
+  width: 3px;
+  background: #ef4444;
+  border-radius: 1px;
+  animation: voice-wave 1s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; }
+
 .bg-white-plain {
   background: #ffffff !important;
 }
@@ -189,15 +218,16 @@ body {
 }
 
 /* Chat Bubble Shapes */
+/* Chat Bubble Shapes - Professional Rectangular Style */
 .bubble-cloud {
-  border-radius: 24px 24px 4px 24px !important;
+  border-radius: 12px 12px 2px 12px !important;
   box-shadow: 
     0 4px 15px rgba(0, 210, 255, 0.1),
     inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
 .bubble-oval {
-  border-radius: 20px !important;
+  border-radius: 12px 12px 12px 2px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 

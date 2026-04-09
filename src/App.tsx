@@ -12,6 +12,11 @@ export default function App() {
   const [showScrollFAB, setShowScrollFAB] = useState(false);
   const [showToast, setShowToast] = useState(true);
   
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(null);
+  const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null);
+  
   const welcomeMessage: Message = {
     id: 'welcome',
     text: "### Welcome to MSU AI (V1.0 Lite) 👋\n\nDeveloped by **Ernest, Amina, and Amina** to help you navigate Maseno with ease. \n\n**Ask me about:**\n📅 Exams | 💰 Fees | 🏠 Hostels | 📝 Units\n\n⚠️ *Under development—verify critical info.*\n\n**We love you, Comrade!** How can I help?",
@@ -23,6 +28,22 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => {
+      setIsOnline(false);
+      setLastOnlineTime(new Date());
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Generate galaxy stars
   const stars = useMemo(() => {
@@ -51,18 +72,40 @@ export default function App() {
     scrollToBottom();
   }, [messages]);
 
+  const speak = (text: string) => {
+    if (!isVoiceEnabled) return;
+    
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    // Remove markdown/formatting for cleaner speech
+    const cleanText = text.replace(/[#*`_~]/g, '').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+    
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 1.1;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  };
+
   const handleSendMessage = async (text: string) => {
+    window.speechSynthesis.cancel();
+
     const userMessage: Message = {
       id: Date.now().toString(),
       text,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      replyTo: replyingToMessage ? {
+        id: replyingToMessage.id,
+        text: replyingToMessage.text,
+        sender: replyingToMessage.sender
+      } : undefined
     };
 
     setMessages(prev => [...prev, userMessage]);
+    setReplyingToMessage(null); // Clear reply state
     setIsLoading(true);
 
-    // AI Response (Context/Matching is handled inside getGrokResponse)
     try {
       const chatAnswer = await getGrokResponse(text, messages);
       const assistantMessage: Message = {
@@ -74,6 +117,9 @@ export default function App() {
       };
       
       setMessages(prev => [...prev, assistantMessage]);
+      if (isVoiceEnabled) {
+        speak(chatAnswer);
+      }
     } catch (error) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -117,7 +163,15 @@ export default function App() {
         </div>
       )}
       
-      <Header theme={theme} onThemeChange={setTheme} onClearChat={handleClearChat} />
+      <Header 
+        theme={theme} 
+        onThemeChange={setTheme} 
+        onClearChat={handleClearChat}
+        isVoiceEnabled={isVoiceEnabled}
+        onVoiceToggle={() => setIsVoiceEnabled(!isVoiceEnabled)}
+        isOnline={isOnline}
+        lastOnlineTime={lastOnlineTime}
+      />
       
       <main 
         ref={scrollContainerRef}
@@ -127,7 +181,12 @@ export default function App() {
         <div className="max-w-4xl mx-auto w-full">
           <AnimatePresence mode="popLayout">
             {messages.map((msg) => (
-              <ChatBubble key={msg.id} message={msg} backgroundType={theme} />
+              <ChatBubble 
+                key={msg.id} 
+                message={msg} 
+                backgroundType={theme} 
+                onReply={() => setReplyingToMessage(msg)}
+              />
             ))}
           </AnimatePresence>
           
@@ -187,7 +246,12 @@ export default function App() {
       </AnimatePresence>
 
       <div className="fixed bottom-0 left-0 right-0 z-50">
-        <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+        <ChatInput 
+          onSendMessage={handleSendMessage} 
+          isLoading={isLoading} 
+          replyingTo={replyingToMessage}
+          onCancelReply={() => setReplyingToMessage(null)}
+        />
       </div>
     </div>
   );

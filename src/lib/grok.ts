@@ -10,6 +10,11 @@ export interface Message {
   sender: 'user' | 'assistant';
   timestamp: Date;
   engine?: 'local' | 'grok' | 'ai';
+  replyTo?: {
+    id: string;
+    text: string;
+    sender: string;
+  };
 }
 
 // Simple keyword-based local lookup with improved scoring
@@ -63,12 +68,22 @@ Remember: Simplify the student's task. If the answer is in the context, use it. 
 
 export async function getGrokResponse(userMessage: string, chatHistory: Message[]) {
   const snippets = getRelevantSnippets(userMessage);
-  const context = snippets.length > 0 ? snippets.join("\n---\n") : "No specific local data found. Please use your general knowledge or search the web for Maseno University information.";
+  const context = snippets.length > 0 ? snippets.join("\n---\n") : "No specific local data found.";
 
   const fullPrompt = systemInstruction.replace("{CONTEXT}", context);
 
+  // Convert chat history to Puter format for contextual memory
+  // We take the last 10 messages to maintain context without hitting token limits
+  const history = chatHistory.slice(-10).map(msg => ({
+    role: msg.sender === 'assistant' ? 'assistant' : 'user',
+    content: msg.text
+  }));
+
   try {
-    const response = await puter.ai.chat(`User Question: ${userMessage}\n\nContext:\n${context}`, {
+    const response = await puter.ai.chat([
+      ...history,
+      { role: 'user', content: `Context from database:\n${context}\n\nUser Question: ${userMessage}` }
+    ], {
       system_message: fullPrompt,
       model: 'gpt-4o-mini',
       stream: false
